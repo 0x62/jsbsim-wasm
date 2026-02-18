@@ -1,0 +1,49 @@
+{
+  "name": "@yokohama/jsbsim-wasm",
+  "version": "0.1.0",
+  "description": "Tooling and TypeScript SDK for JSBSim compiled to WebAssembly",
+  "license": "LGPL-2.1-or-later",
+  "type": "module",
+  "files": [
+    "dist",
+    "generated",
+    "src/generated"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "prepare:jsbsim": "./scripts/prepare-jsbsim.sh",
+    "generate:bindings": "node ./scripts/generate-fgfdmexec-bindings.mjs",
+    "build:wasm": "./scripts/build-wasm.sh",
+    "build:sdk": "tsup src/index.ts --format esm --dts --sourcemap --clean",
+    "build": "npm run generate:bindings && npm run build:wasm && npm run build:sdk",
+    "typecheck": "tsc --noEmit",
+    "update:jsbsim": "./scripts/update-jsbsim.sh",
+    "release:metadata": "node ./scripts/write-publish-metadata.mjs --version $(node -p \"require('./package.json').version\")",
+    "release": "./scripts/release.sh",
+    "demo:install": "npm --prefix demo install",
+    "demo:sync-wasm": "./scripts/sync-demo-wasm.sh",
+    "demo:sync-scenario": "node ./scripts/sync-demo-scenario.mjs",
+    "demo:sync-assets": "npm run demo:sync-wasm && npm run demo:sync-scenario",
+    "demo:prepare": "npm run build:wasm && npm run demo:sync-assets",
+    "demo:dev": "npm --prefix demo run dev",
+    "demo:build": "npm --prefix demo run build",
+    "demo:preview": "npm --prefix demo run preview",
+    "clean": "rm -rf build dist generated/FGFDMExecBindings.cpp src/generated/fgfdmexec-api.ts"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.0"
+  }
+}

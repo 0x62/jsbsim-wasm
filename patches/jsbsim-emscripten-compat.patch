@@ -1,0 +1,99 @@
+diff --git a/src/FGJSBBase.cpp b/src/FGJSBBase.cpp
+index ac0f6b36..14a9eb76 100644
+--- a/src/FGJSBBase.cpp
++++ b/src/FGJSBBase.cpp
+@@ -46,6 +46,19 @@ namespace JSBSim {
+ CLASS IMPLEMENTATION
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%*/
+ 
++#if defined(__EMSCRIPTEN__)
++char FGJSBBase::highint[5]  = {'\0'};
++char FGJSBBase::halfint[5]  = {'\0'};
++char FGJSBBase::normint[6]  = {'\0'};
++char FGJSBBase::reset[5]    = {'\0'};
++char FGJSBBase::underon[5]  = {'\0'};
++char FGJSBBase::underoff[6] = {'\0'};
++char FGJSBBase::fgblue[6]   = {'\0'};
++char FGJSBBase::fgcyan[6]   = {'\0'};
++char FGJSBBase::fgred[6]    = {'\0'};
++char FGJSBBase::fggreen[6]  = {'\0'};
++char FGJSBBase::fgdef[6]    = {'\0'};
++#else
+ char FGJSBBase::highint[5]  = {27, '[', '1', 'm', '\0'      };
+ char FGJSBBase::halfint[5]  = {27, '[', '2', 'm', '\0'      };
+ char FGJSBBase::normint[6]  = {27, '[', '2', '2', 'm', '\0' };
+@@ -57,6 +70,7 @@ char FGJSBBase::fgcyan[6]   = {27, '[', '3', '6', 'm', '\0' };
+ char FGJSBBase::fgred[6]    = {27, '[', '3', '1', 'm', '\0' };
+ char FGJSBBase::fggreen[6]  = {27, '[', '3', '2', 'm', '\0' };
+ char FGJSBBase::fgdef[6]    = {27, '[', '3', '9', 'm', '\0' };
++#endif
+ 
+ const string FGJSBBase::needed_cfg_version = "2.0";
+ const string FGJSBBase::JSBSim_version = JSBSIM_VERSION " " __DATE__ " " __TIME__ ;
+@@ -91,4 +105,3 @@ string FGJSBBase::CreateIndexedPropertyName(const string& Property, int index)
+ //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ 
+ } // namespace JSBSim
+-
+diff --git a/src/input_output/FGfdmSocket.cpp b/src/input_output/FGfdmSocket.cpp
+index e7db133c..28bcde36 100644
+--- a/src/input_output/FGfdmSocket.cpp
++++ b/src/input_output/FGfdmSocket.cpp
+@@ -40,13 +40,22 @@ INCLUDES
+ 
+ #if defined(_MSC_VER) || defined(__MINGW32__)
+ #include <ws2tcpip.h>
+-#elif defined(__OpenBSD__)
++#elif defined(__OpenBSD__) || defined(__EMSCRIPTEN__)
+ #include <sys/types.h>
+ #include <sys/socket.h>
++#include <netinet/in.h>
+ #include <netdb.h>
++#include <sys/select.h>
++#include <sys/time.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ #else
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netinet/in.h>
++#include <netdb.h>
++#include <sys/select.h>
++#include <sys/time.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+ #endif
+diff --git a/src/simgear/misc/strutils.cxx b/src/simgear/misc/strutils.cxx
+index f59f1850..338a843c 100644
+--- a/src/simgear/misc/strutils.cxx
++++ b/src/simgear/misc/strutils.cxx
+@@ -682,9 +682,9 @@ std::string error_string(int errnum)
+   errno_t retcode;
+   // Always makes the string in 'buf' null-terminated
+   retcode = strerror_s(buf, sizeof(buf), errnum);
+-#elif defined(_GNU_SOURCE)
++#elif defined(_GNU_SOURCE) && !defined(__EMSCRIPTEN__)
+   return std::string(strerror_r(errnum, buf, sizeof(buf)));
+-#elif (_POSIX_C_SOURCE >= 200112L) || defined(SG_MAC) || defined(__FreeBSD__)
++#elif (_POSIX_C_SOURCE >= 200112L) || defined(SG_MAC) || defined(__FreeBSD__) || defined(__EMSCRIPTEN__)
+   int retcode;
+   // POSIX.1-2001 and POSIX.1-2008
+   retcode = strerror_r(errnum, buf, sizeof(buf));
+@@ -692,7 +692,7 @@ std::string error_string(int errnum)
+ #error "Could not find a thread-safe alternative to strerror()."
+ #endif
+ 
+-#if !defined(_GNU_SOURCE)
++#if !defined(_GNU_SOURCE) || defined(__EMSCRIPTEN__)
+   if (retcode) {
+     std::string msg = "unable to get error message for a given error number";
+     // C++11 would make this shorter with std::to_string()
+@@ -710,7 +710,7 @@ std::string error_string(int errnum)
+   }
+ 
+   return std::string(buf);
+-#endif  // !defined(_GNU_SOURCE)
++#endif  // !defined(_GNU_SOURCE) || defined(__EMSCRIPTEN__)
+ }
+ 
+ } // end namespace strutils

@@ -1,0 +1,59 @@
+{
+  "generatedAt": "2026-02-18T14:42:07.951Z",
+  "package": {
+    "name": "@yokohama/jsbsim-wasm",
+    "version": "0.1.0",
+    "npmTag": "latest",
+    "tarballName": "yokohama-jsbsim-wasm-0.1.0.tgz",
+    "unpackedSize": 58895
+  },
+  "release": {
+    "gitTag": "v0.1.0",
+    "gitCommit": "178f0f9aa2e8170ef727d47a56ba9445dbae2333",
+    "gitShortCommit": "178f0f9",
+    "gitBranch": "0x62/release-and-react-demo"
+  },
+  "jsbsim": {
+    "submodulePath": "vendor/jsbsim",
+    "commit": "1a2e114d79af2430db02a4f7a4a85328cdc5d403",
+    "shortCommit": "1a2e114d",
+    "describe": "Linux-773-g1a2e114d"
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "size": 4060,
+      "sha256": "ca9db189a9e8c6f9ea737dfa9123ffd7897a523d70e8ac6434848d3884188b70"
+    },
+    {
+      "path": "dist/index.d.ts",
+      "size": 7091,
+      "sha256": "28c0e92e1a4d4851f160c12d298eec187426e69eb6a16d88eb4ccefaf30000da"
+    },
+    {
+      "path": "dist/index.js",
+      "size": 8450,
+      "sha256": "fe7e44df18cfe015b75995a6c01bb613102a2d91e01d18bc6ad953c4cb03ff7b"
+    },
+    {
+      "path": "dist/index.js.map",
+      "size": 17134,
+      "sha256": "b8b31f63456c28ed2f2c524d0051f0f4b8f03fe5856c2b86d8ef7ca38c0d90eb"
+    },
+    {
+      "path": "generated/FGFDMExecBindings.cpp",
+      "size": 17555,
+      "sha256": "38bac2844f4f283d7a8d44ee80173e8052ea499ec7d184336271f10934ad4718"
+    },
+    {
+      "path": "package.json",
+      "size": 1553,
+      "sha256": "4e13f742db0d9619170b62631da8ca57a57f124710767fae0402d86e4bf0bc0e"
+    },
+    {
+      "path": "src/generated/fgfdmexec-api.ts",
+      "size": 3052,
+      "sha256": "78cb3a6ce050ac8d32f79c8ce5cf216f54dc07d7e805f16e742998b04069ee99"
+    }
+  ]
+}

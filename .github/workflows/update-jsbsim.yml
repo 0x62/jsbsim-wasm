@@ -1,0 +1,46 @@
+name: Update JSBSim WASM
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.69
+
+      - name: Update JSBSim and rebuild artifacts
+        run: ./scripts/update-jsbsim.sh origin/master
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/update-jsbsim-wasm
+          commit-message: "chore: update JSBSim and regenerate wasm"
+          title: "chore: update JSBSim and regenerate wasm"
+          body: |
+            Automated update of JSBSim submodule + regenerated bindings/wasm artifacts.
+          labels: dependencies, automation

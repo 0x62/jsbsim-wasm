@@ -1,0 +1,30 @@
+{
+  "scenario": "hobby-rocket-launch",
+  "model": "hobby_rocket",
+  "scriptPath": "scripts/hobby_rocket_launch.xml",
+  "telemetry": {
+    "altitudeFt": "position/h-sl-ft",
+    "verticalVelocityFps": "velocities/h-dot-fps",
+    "thrustProperty": "propulsion/rocket_thrust"
+  },
+  "rocket": {
+    "thrustLbf": 24,
+    "burnDurationSec": 2.2,
+    "launchDelaySec": 0.15,
+    "touchdownAltitudeFt": 0.5
+  },
+  "files": [
+    {
+      "runtimePath": "aircraft/hobby_rocket/hobby_rocket.xml",
+      "publicPath": "/scenario/hobby-rocket/aircraft/hobby_rocket/hobby_rocket.xml"
+    },
+    {
+      "runtimePath": "aircraft/hobby_rocket/launchpad.xml",
+      "publicPath": "/scenario/hobby-rocket/aircraft/hobby_rocket/launchpad.xml"
+    },
+    {
+      "runtimePath": "scripts/hobby_rocket_launch.xml",
+      "publicPath": "/scenario/hobby-rocket/scripts/hobby_rocket_launch.xml"
+    }
+  ]
+}
