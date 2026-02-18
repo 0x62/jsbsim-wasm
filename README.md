@@ -46,7 +46,7 @@ Artifacts:
 ## SDK Example
 
 ```ts
-import { JSBSimSdk } from "@yokohama/jsbsim-wasm";
+import { JSBSimSdk } from "@0x62/jsbsim-wasm";
 
 const sdk = await JSBSimSdk.create({
   moduleUrl: new URL("./dist/wasm/jsbsim_wasm.mjs", import.meta.url),
