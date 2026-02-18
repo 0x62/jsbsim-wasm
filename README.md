@@ -2,6 +2,9 @@
 
 This repository builds [JSBSim](https://github.com/JSBSim-Team/jsbsim) to WebAssembly for Node.js and browsers, and ships a TypeScript SDK for loading and interacting with `FGFDMExec`.
 
+> [!WARNING]  
+> This toolkit is still in early development and may contain bugs or unexpected behavior. Use at your own risk.
+
 ## Highlights
 
 - JSBSim is tracked as a git submodule at `vendor/jsbsim`.
@@ -9,18 +12,7 @@ This repository builds [JSBSim](https://github.com/JSBSim-Team/jsbsim) to WebAss
 - No static data preloading is used.
 - Runtime data lives in Emscripten MEMFS for speed.
 - Optional persistence is available through IDBFS sync (browser).
-- Automated update flow is included for upstream JSBSim changes.
 - SDK package output is ESM-first.
-- Release tooling can bump version, tag git, and emit publish metadata.
-- Included `demo/` React SPA for interactive simulation controls and telemetry.
-
-## Layout
-
-- `scripts/generate-fgfdmexec-bindings.mjs`: parses `FGFDMExec.h`, generates:
-  - `generated/FGFDMExecBindings.cpp`
-  - `src/generated/fgfdmexec-api.ts`
-- `cmake/CMakeLists.txt`: builds JSBSim + generated embind bridge into `jsbsim_wasm.mjs` + `jsbsim_wasm.wasm`
-- `src/sdk/*`: TypeScript SDK runtime, loader, and VFS helpers
 
 ## Prerequisites
 
@@ -61,17 +53,14 @@ const sdk = await JSBSimSdk.create({
   wasmUrl: new URL("./dist/wasm/jsbsim_wasm.wasm", import.meta.url),
   persistence: { enabled: true },
   log: {
-    console: true,
-    onStdout: (entry) => {
-      // optional hook for JSBSim stdout
-    },
-    onStderr: (entry) => {
-      // optional hook for JSBSim stderr
-    }
+    console: true,           // Also output to console
+    stripAnsi: true,         // Remove escape sequences from log output
+    onStdout: (entry) => {}, // optional hook for JSBSim stdout
+    onStderr: (entry) => {}  // optional hook for JSBSim stderr
   }
 });
 
-// Write model/config files into runtime MEMFS (no preload bundle)
+// Write model/config files into VFS
 sdk.writeDataFile("aircraft/c172/c172.xml", xmlText);
 
 sdk.configurePaths({
@@ -90,22 +79,6 @@ const altitude = sdk.getProperty("position/h-sl-ft");
 // Persist runtime tree to IDBFS when needed
 await sdk.syncToPersistence();
 ```
-
-## Data FS Strategy
-
-- Runtime execution uses MEMFS under `/runtime`.
-- If persistence is enabled, IDBFS is mounted separately (default `/persist`).
-- `syncFromPersistence()` copies IDBFS -> MEMFS.
-- `syncToPersistence()` copies MEMFS -> IDBFS and calls `FS.syncfs(false)`.
-
-This avoids slow direct runtime reads from IDBFS while still supporting browser persistence.
-
-## Logging
-
-- JSBSim stdout/stderr are routed through a pluggable SDK logger.
-- Default behavior is console output (`console.log` / `console.error`).
-- You can attach hooks with `log.onStdout`, `log.onStderr`, or `log.onLog`.
-- ANSI escape sequences are stripped by default (`log.stripAnsi: true`) so logs are plain text.
 
 ## Updating JSBSim
 
