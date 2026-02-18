@@ -1,0 +1,239 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root {
+  --bg-a: #f7f5ee;
+  --bg-b: #e8f4f1;
+  --surface: rgba(255, 255, 255, 0.78);
+  --text: #102020;
+  --muted: #425a58;
+  --line: rgba(16, 32, 32, 0.14);
+  --accent-a: #0d9488;
+  --accent-b: #f97316;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Space Grotesk", "Avenir Next", sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 15% 12%, rgba(249, 115, 22, 0.18), transparent 45%),
+    radial-gradient(circle at 88% 10%, rgba(13, 148, 136, 0.22), transparent 40%),
+    linear-gradient(130deg, var(--bg-a), var(--bg-b));
+}
+
+.app-shell {
+  width: min(1080px, 94vw);
+  margin: 0 auto;
+  padding: 32px 0 44px;
+}
+
+.hero {
+  margin-bottom: 18px;
+}
+
+.kicker {
+  margin: 0 0 6px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.05;
+}
+
+.copy {
+  margin: 10px 0 0;
+  max-width: 760px;
+  color: var(--muted);
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  backdrop-filter: blur(6px);
+  padding: 16px;
+  box-shadow: 0 22px 44px rgba(16, 32, 32, 0.08);
+}
+
+.controls {
+  margin-bottom: 14px;
+}
+
+.stage-panel {
+  margin-bottom: 14px;
+}
+
+.stage-panel h2 {
+  margin: 0 0 10px;
+}
+
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stage-chip {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.68);
+  padding: 10px 10px 9px;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.stage-chip.pending {
+  opacity: 0.7;
+}
+
+.stage-chip.completed {
+  border-color: rgba(13, 148, 136, 0.45);
+}
+
+.stage-chip.current {
+  box-shadow: 0 10px 20px rgba(13, 148, 136, 0.14);
+  transform: translateY(-1px);
+}
+
+.stage-name {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stage-meta {
+  margin: 6px 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.status-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin-bottom: 12px;
+}
+
+.status-line span {
+  color: var(--muted);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.82rem;
+  color: white;
+  cursor: pointer;
+  background: linear-gradient(105deg, var(--accent-a), var(--accent-b));
+  box-shadow: 0 10px 24px rgba(16, 32, 32, 0.16);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metric-card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 12px;
+}
+
+.metric-card h2 {
+  margin: 0;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.metric-card p {
+  margin: 8px 0 0;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.charts h2 {
+  margin: 0;
+}
+
+.subtle {
+  margin: 6px 0 12px;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.chart-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.68);
+  padding: 10px;
+}
+
+.chart-card h3 {
+  margin: 0 0 8px;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.chart-frame {
+  width: 100%;
+  height: 190px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(245, 252, 251, 0.86);
+}
+
+@media (max-width: 900px) {
+  .stage-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .stage-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}

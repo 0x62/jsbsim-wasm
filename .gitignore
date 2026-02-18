@@ -1,0 +1,15 @@
+node_modules
+build/
+dist/
+*.log
+*.tsbuildinfo
+.DS_Store
+
+# local context
+.context/
+
+# demo wasm sync output
+demo/public/wasm/*
+!demo/public/wasm/.gitkeep
+demo/vite.config.js
+demo/vite.config.d.ts
