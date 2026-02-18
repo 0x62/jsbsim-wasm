@@ -146,3 +146,9 @@ npm run demo:dev
 ## Notes on API Exposure
 
 The generated bridge exports all parsed public methods on `FGFDMExec` automatically. For complex native types that are not JS-safe, opaque numeric handles are used.
+
+## License
+
+This SDK bundles a WebAssembly build of JSBSim, which is licensed under the GNU Lesser General Public License v2.1 (LGPL-2.1). The WebAssembly bundle, and associated compatibility patches (`/patches`) are distributed under the terms of the LGPL-2.1.
+
+This SDK itself, which provides a Javascript/Typescript wrapper around the JSBSim WASM module, is licensed under the MIT License.

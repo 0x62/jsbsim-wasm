@@ -1,8 +1,8 @@
 {
-  "name": "@yokohama/jsbsim-wasm",
+  "name": "@0x62/jsbsim-wasm",
   "version": "0.1.0",
   "description": "Tooling and TypeScript SDK for JSBSim compiled to WebAssembly",
-  "license": "LGPL-2.1-or-later",
+  "license": "MIT",
   "type": "module",
   "files": [
     "dist",

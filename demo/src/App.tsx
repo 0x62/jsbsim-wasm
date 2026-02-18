@@ -47,7 +47,7 @@ type TelemetrySample = {
 
 const LOOP_INTERVAL_MS = 50;
 const MAX_SAMPLES = 280;
-const SCENARIO_MANIFEST_URL = "/scenario/hobby-rocket/manifest.json";
+const SCENARIO_MANIFEST_PATH = "/scenario/hobby-rocket/manifest.json";
 
 const STAGE_SEQUENCE: FlightStage[] = ["launch", "burnout", "coast", "apogee", "descent", "landing"];
 
@@ -111,6 +111,13 @@ function formatTimeTick(value: unknown): string {
   }
 
   return `${numeric.toFixed(1)}s`;
+}
+
+function withBase(path: string): string {
+  const base = import.meta.env.BASE_URL || "/";
+  const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  return `${normalizedBase}${normalizedPath}`;
 }
 
 async function fetchBytes(url: string): Promise<Uint8Array> {
@@ -225,15 +232,15 @@ export default function App() {
     }
 
     try {
-      const manifestResponse = await fetch(SCENARIO_MANIFEST_URL);
+      const manifestResponse = await fetch(withBase(SCENARIO_MANIFEST_PATH));
       if (!manifestResponse.ok) {
         throw new Error(`Unable to load scenario manifest (${manifestResponse.status}).`);
       }
 
       const nextManifest = (await manifestResponse.json()) as ScenarioManifest;
       const sdk = await JSBSimSdk.create({
-        moduleUrl: "/wasm/jsbsim_wasm.mjs",
-        wasmUrl: "/wasm/jsbsim_wasm.wasm"
+        moduleUrl: withBase("/wasm/jsbsim_wasm.mjs"),
+        wasmUrl: withBase("/wasm/jsbsim_wasm.wasm")
       });
 
       sdk.configurePaths({
@@ -245,7 +252,7 @@ export default function App() {
       });
 
       for (const file of nextManifest.files) {
-        const bytes = await fetchBytes(file.publicPath);
+        const bytes = await fetchBytes(withBase(file.publicPath));
         sdk.writeDataFile(file.runtimePath, bytes);
       }
 
