@@ -1,6 +1,6 @@
 {
   "name": "@0x62/jsbsim-wasm",
-  "version": "0.1.0",
+  "version": "1.2.4-beta.1",
   "description": "Tooling and TypeScript SDK for JSBSim compiled to WebAssembly",
   "license": "MIT",
   "type": "module",

@@ -1,59 +1,95 @@
 {
-  "generatedAt": "2026-02-18T14:42:07.951Z",
+  "generatedAt": "2026-02-20T14:41:20.436Z",
   "package": {
-    "name": "@yokohama/jsbsim-wasm",
-    "version": "0.1.0",
-    "npmTag": "latest",
-    "tarballName": "yokohama-jsbsim-wasm-0.1.0.tgz",
-    "unpackedSize": 58895
+    "name": "@0x62/jsbsim-wasm",
+    "version": "1.2.4-beta.1",
+    "npmTag": "beta",
+    "tarballName": "0x62-jsbsim-wasm-1.2.4-beta.1.tgz",
+    "unpackedSize": 1892717
   },
   "release": {
-    "gitTag": "v0.1.0",
-    "gitCommit": "178f0f9aa2e8170ef727d47a56ba9445dbae2333",
-    "gitShortCommit": "178f0f9",
-    "gitBranch": "0x62/release-and-react-demo"
+    "gitTag": "v1.2.4-beta.1",
+    "gitCommit": "caa73cb7d83a8d2cd61462450927d63981eaa9b2",
+    "gitShortCommit": "caa73cb",
+    "gitBranch": "master"
   },
   "jsbsim": {
     "submodulePath": "vendor/jsbsim",
+    "tag": "v1.2.4",
     "commit": "1a2e114d79af2430db02a4f7a4a85328cdc5d403",
     "shortCommit": "1a2e114d",
     "describe": "Linux-773-g1a2e114d"
   },
   "artifacts": [
     {
+      "path": "LICENSE",
+      "size": 1071,
+      "sha256": "15e2d343fc930439fb82351d7c30f3d151b4c42ca3132c13ff1a60da527a1259"
+    },
+    {
       "path": "README.md",
-      "size": 4060,
-      "sha256": "ca9db189a9e8c6f9ea737dfa9123ffd7897a523d70e8ac6434848d3884188b70"
+      "size": 6841,
+      "sha256": "778900962ca975ef18172c1deccde825a892e1d1989e98e6c13abc8e46ebfe58"
     },
     {
       "path": "dist/index.d.ts",
-      "size": 7091,
-      "sha256": "28c0e92e1a4d4851f160c12d298eec187426e69eb6a16d88eb4ccefaf30000da"
+      "size": 34797,
+      "sha256": "e2401320c51ead90f18d7401e0c856a1e1b5dca055cb5ed886d949b971010367"
     },
     {
       "path": "dist/index.js",
-      "size": 8450,
-      "sha256": "fe7e44df18cfe015b75995a6c01bb613102a2d91e01d18bc6ad953c4cb03ff7b"
+      "size": 25398,
+      "sha256": "40adaac96c40e5b8bffc21c55456cb63c747b5186498ad6d409d8ab091ac613c"
     },
     {
       "path": "dist/index.js.map",
-      "size": 17134,
-      "sha256": "b8b31f63456c28ed2f2c524d0051f0f4b8f03fe5856c2b86d8ef7ca38c0d90eb"
+      "size": 59964,
+      "sha256": "a1704d33114473676bf000b7da69f407ab9d297d266fd49d493a09c303f24b80"
+    },
+    {
+      "path": "dist/wasm.d.ts",
+      "size": 487,
+      "sha256": "b7bbbab6f5e6b0b297dfeff117351e53d4d8598fecde7e805ea9aee7b2923353"
+    },
+    {
+      "path": "dist/wasm.js",
+      "size": 368,
+      "sha256": "758d98989301d86ec3aa589fa851d6416b305eca58bb1e6b9579780ea339e09b"
+    },
+    {
+      "path": "dist/wasm.js.map",
+      "size": 751,
+      "sha256": "d75a89efd5b3cf07ebfbe70d321f55c01bd8cdde1be50a15d1dcfad21a7ca763"
+    },
+    {
+      "path": "dist/wasm/jsbsim_wasm.mjs",
+      "size": 122471,
+      "sha256": "1652f81718a69bb6ec22a786be5495ee3f9b5f6ca5c5c67487948f918495d55a"
+    },
+    {
+      "path": "dist/wasm/jsbsim_wasm.wasm",
+      "size": 1588236,
+      "sha256": "15793c4548e28688b0dc77cf364e1afaccaa6d977f52ce82e0b3419dddcf0cb5"
     },
     {
       "path": "generated/FGFDMExecBindings.cpp",
-      "size": 17555,
-      "sha256": "38bac2844f4f283d7a8d44ee80173e8052ea499ec7d184336271f10934ad4718"
+      "size": 17846,
+      "sha256": "8e17ac03fd57a3f2cd9d57c64a35bb78813cf5ee3e6232efdf0ec981cf82285f"
     },
     {
       "path": "package.json",
-      "size": 1553,
-      "sha256": "4e13f742db0d9619170b62631da8ca57a57f124710767fae0402d86e4bf0bc0e"
+      "size": 2079,
+      "sha256": "0674b068ec006d0bad679e741c04b7397b0f783fc9450799350847c1d2a41eac"
     },
     {
       "path": "src/generated/fgfdmexec-api.ts",
-      "size": 3052,
-      "sha256": "78cb3a6ce050ac8d32f79c8ce5cf216f54dc07d7e805f16e742998b04069ee99"
+      "size": 14824,
+      "sha256": "41f816f85ec1d7d0f1bcb209ca8dae9bfe57af373838ee975bd54cf43821b8a3"
+    },
+    {
+      "path": "src/generated/jsbsim-api.ts",
+      "size": 17584,
+      "sha256": "664de03ff65a8eaa60d15db06190570437603c9db8694a720a230b3da8ff5412"
     }
   ]
 }
