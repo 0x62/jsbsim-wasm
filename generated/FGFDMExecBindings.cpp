@@ -22,6 +22,11 @@ std::enable_if_t<std::is_arithmetic_v<T>, T> toJsValue(T value) {
   return value;
 }
 
+template <typename T>
+std::enable_if_t<std::is_enum_v<T>, int> toJsValue(T value) {
+  return static_cast<int>(value);
+}
+
 inline std::string toJsValue(const std::string& value) {
   return value;
 }
@@ -78,36 +83,36 @@ static auto wrap_FGFDMExec_RunIC_2(FGFDMExec& self) {
   return toJsValue(self.RunIC());
 }
 
-static auto wrap_FGFDMExec_LoadPlanet_3(FGFDMExec& self, const std::string& arg0, bool arg1) {
-  return toJsValue(self.LoadPlanet(SGPath(arg0), arg1));
+static auto wrap_FGFDMExec_LoadPlanet_3(FGFDMExec& self, const std::string& PlanetPath, bool useAircraftPath) {
+  return toJsValue(self.LoadPlanet(SGPath(PlanetPath), useAircraftPath));
 }
 
-static auto wrap_FGFDMExec_LoadModel_4(FGFDMExec& self, const std::string& arg0, const std::string& arg1, const std::string& arg2, const std::string& arg3, bool arg4) {
-  return toJsValue(self.LoadModel(SGPath(arg0), SGPath(arg1), SGPath(arg2), arg3, arg4));
+static auto wrap_FGFDMExec_LoadModel_4(FGFDMExec& self, const std::string& AircraftPath, const std::string& EnginePath, const std::string& SystemsPath, const std::string& model, bool addModelToPath) {
+  return toJsValue(self.LoadModel(SGPath(AircraftPath), SGPath(EnginePath), SGPath(SystemsPath), model, addModelToPath));
 }
 
-static auto wrap_FGFDMExec_LoadModel_5(FGFDMExec& self, const std::string& arg0, bool arg1) {
-  return toJsValue(self.LoadModel(arg0, arg1));
+static auto wrap_FGFDMExec_LoadModel_5(FGFDMExec& self, const std::string& model, bool addModelToPath) {
+  return toJsValue(self.LoadModel(model, addModelToPath));
 }
 
-static auto wrap_FGFDMExec_LoadScript_6(FGFDMExec& self, const std::string& arg0, double arg1, const std::string& arg2) {
-  return toJsValue(self.LoadScript(SGPath(arg0), arg1, SGPath(arg2)));
+static auto wrap_FGFDMExec_LoadScript_6(FGFDMExec& self, const std::string& Script, double deltaT, const std::string& initfile) {
+  return toJsValue(self.LoadScript(SGPath(Script), deltaT, SGPath(initfile)));
 }
 
-static auto wrap_FGFDMExec_SetEnginePath_7(FGFDMExec& self, const std::string& arg0) {
-  return toJsValue(self.SetEnginePath(SGPath(arg0)));
+static auto wrap_FGFDMExec_SetEnginePath_7(FGFDMExec& self, const std::string& path) {
+  return toJsValue(self.SetEnginePath(SGPath(path)));
 }
 
-static auto wrap_FGFDMExec_SetAircraftPath_8(FGFDMExec& self, const std::string& arg0) {
-  return toJsValue(self.SetAircraftPath(SGPath(arg0)));
+static auto wrap_FGFDMExec_SetAircraftPath_8(FGFDMExec& self, const std::string& path) {
+  return toJsValue(self.SetAircraftPath(SGPath(path)));
 }
 
-static auto wrap_FGFDMExec_SetSystemsPath_9(FGFDMExec& self, const std::string& arg0) {
-  return toJsValue(self.SetSystemsPath(SGPath(arg0)));
+static auto wrap_FGFDMExec_SetSystemsPath_9(FGFDMExec& self, const std::string& path) {
+  return toJsValue(self.SetSystemsPath(SGPath(path)));
 }
 
-static auto wrap_FGFDMExec_SetOutputPath_10(FGFDMExec& self, const std::string& arg0) {
-  return toJsValue(self.SetOutputPath(SGPath(arg0)));
+static auto wrap_FGFDMExec_SetOutputPath_10(FGFDMExec& self, const std::string& path) {
+  return toJsValue(self.SetOutputPath(SGPath(path)));
 }
 
 static auto wrap_FGFDMExec_GetAtmosphere_11(FGFDMExec& self) {
@@ -206,12 +211,12 @@ static auto wrap_FGFDMExec_GetOutputPath_34(FGFDMExec& self) {
   return toJsValue(self.GetOutputPath());
 }
 
-static auto wrap_FGFDMExec_GetPropertyValue_35(FGFDMExec& self, const std::string& arg0) {
-  return toJsValue(self.GetPropertyValue(arg0));
+static auto wrap_FGFDMExec_GetPropertyValue_35(FGFDMExec& self, const std::string& property) {
+  return toJsValue(self.GetPropertyValue(property));
 }
 
-static void wrap_FGFDMExec_SetPropertyValue_36(FGFDMExec& self, const std::string& arg0, double arg1) {
-  self.SetPropertyValue(arg0, arg1);
+static void wrap_FGFDMExec_SetPropertyValue_36(FGFDMExec& self, const std::string& property, double value) {
+  self.SetPropertyValue(property, value);
 }
 
 static auto wrap_FGFDMExec_GetModelName_37(FGFDMExec& self) {
@@ -230,36 +235,36 @@ static auto wrap_FGFDMExec_GetFDMCount_40(FGFDMExec& self) {
   return toJsValue(self.GetFDMCount());
 }
 
-static auto wrap_FGFDMExec_GetChildFDM_41(FGFDMExec& self, int arg0) {
-  return toJsValue(self.GetChildFDM(arg0));
+static auto wrap_FGFDMExec_GetChildFDM_41(FGFDMExec& self, int i) {
+  return toJsValue(self.GetChildFDM(i));
 }
 
-static void wrap_FGFDMExec_SetChild_42(FGFDMExec& self, bool arg0) {
-  self.SetChild(arg0);
+static void wrap_FGFDMExec_SetChild_42(FGFDMExec& self, bool ch) {
+  self.SetChild(ch);
 }
 
-static auto wrap_FGFDMExec_SetOutputDirectives_43(FGFDMExec& self, const std::string& arg0) {
-  return toJsValue(self.SetOutputDirectives(SGPath(arg0)));
+static auto wrap_FGFDMExec_SetOutputDirectives_43(FGFDMExec& self, const std::string& fname) {
+  return toJsValue(self.SetOutputDirectives(SGPath(fname)));
 }
 
-static void wrap_FGFDMExec_ForceOutput_44(FGFDMExec& self, int arg0) {
-  self.ForceOutput(arg0);
+static void wrap_FGFDMExec_ForceOutput_44(FGFDMExec& self, int idx) {
+  self.ForceOutput(idx);
 }
 
-static void wrap_FGFDMExec_SetLoggingRate_45(FGFDMExec& self, double arg0) {
-  self.SetLoggingRate(arg0);
+static void wrap_FGFDMExec_SetLoggingRate_45(FGFDMExec& self, double rate) {
+  self.SetLoggingRate(rate);
 }
 
-static auto wrap_FGFDMExec_SetOutputFileName_46(FGFDMExec& self, int arg0, const std::string& arg1) {
-  return toJsValue(self.SetOutputFileName(arg0, arg1));
+static auto wrap_FGFDMExec_SetOutputFileName_46(FGFDMExec& self, int n, const std::string& fname) {
+  return toJsValue(self.SetOutputFileName(n, fname));
 }
 
-static auto wrap_FGFDMExec_GetOutputFileName_47(FGFDMExec& self, int arg0) {
-  return toJsValue(self.GetOutputFileName(arg0));
+static auto wrap_FGFDMExec_GetOutputFileName_47(FGFDMExec& self, int n) {
+  return toJsValue(self.GetOutputFileName(n));
 }
 
-static void wrap_FGFDMExec_DoTrim_48(FGFDMExec& self, int arg0) {
-  self.DoTrim(arg0);
+static void wrap_FGFDMExec_DoTrim_48(FGFDMExec& self, int mode) {
+  self.DoTrim(mode);
 }
 
 static void wrap_FGFDMExec_DoLinearization_49(FGFDMExec& self, int arg0) {
@@ -278,8 +283,8 @@ static void wrap_FGFDMExec_Hold_52(FGFDMExec& self) {
   self.Hold();
 }
 
-static void wrap_FGFDMExec_EnableIncrementThenHold_53(FGFDMExec& self, int arg0) {
-  self.EnableIncrementThenHold(arg0);
+static void wrap_FGFDMExec_EnableIncrementThenHold_53(FGFDMExec& self, int Timesteps) {
+  self.EnableIncrementThenHold(Timesteps);
 }
 
 static void wrap_FGFDMExec_CheckIncrementalHold_54(FGFDMExec& self) {
@@ -294,20 +299,20 @@ static auto wrap_FGFDMExec_Holding_56(FGFDMExec& self) {
   return toJsValue(self.Holding());
 }
 
-static void wrap_FGFDMExec_ResetToInitialConditions_57(FGFDMExec& self, int arg0) {
-  self.ResetToInitialConditions(arg0);
+static void wrap_FGFDMExec_ResetToInitialConditions_57(FGFDMExec& self, int mode) {
+  self.ResetToInitialConditions(mode);
 }
 
-static void wrap_FGFDMExec_SetDebugLevel_58(FGFDMExec& self, int arg0) {
-  self.SetDebugLevel(arg0);
+static void wrap_FGFDMExec_SetDebugLevel_58(FGFDMExec& self, int level) {
+  self.SetDebugLevel(level);
 }
 
-static void wrap_FGFDMExec_BuildPropertyCatalog_59(FGFDMExec& self, uintptr_t arg0) {
-  self.BuildPropertyCatalog(reinterpret_cast<FGFDMExec::PropertyCatalogStructure*>(arg0));
+static void wrap_FGFDMExec_BuildPropertyCatalog_59(FGFDMExec& self, uintptr_t pcs) {
+  self.BuildPropertyCatalog(reinterpret_cast<FGFDMExec::PropertyCatalogStructure*>(pcs));
 }
 
-static auto wrap_FGFDMExec_QueryPropertyCatalog_60(FGFDMExec& self, const std::string& arg0, const std::string& arg1) {
-  return toJsValue(self.QueryPropertyCatalog(arg0, arg1));
+static auto wrap_FGFDMExec_QueryPropertyCatalog_60(FGFDMExec& self, const std::string& check, const std::string& end_of_line) {
+  return toJsValue(self.QueryPropertyCatalog(check, end_of_line));
 }
 
 static void wrap_FGFDMExec_PrintPropertyCatalog_61(FGFDMExec& self) {
@@ -322,16 +327,16 @@ static auto wrap_FGFDMExec_GetPropertyCatalog_63(FGFDMExec& self) {
   return toJsValue(self.GetPropertyCatalog());
 }
 
-static void wrap_FGFDMExec_SetTrimStatus_64(FGFDMExec& self, bool arg0) {
-  self.SetTrimStatus(arg0);
+static void wrap_FGFDMExec_SetTrimStatus_64(FGFDMExec& self, bool status) {
+  self.SetTrimStatus(status);
 }
 
 static auto wrap_FGFDMExec_GetTrimStatus_65(FGFDMExec& self) {
   return toJsValue(self.GetTrimStatus());
 }
 
-static void wrap_FGFDMExec_SetTrimMode_66(FGFDMExec& self, int arg0) {
-  self.SetTrimMode(arg0);
+static void wrap_FGFDMExec_SetTrimMode_66(FGFDMExec& self, int mode) {
+  self.SetTrimMode(mode);
 }
 
 static auto wrap_FGFDMExec_GetTrimMode_67(FGFDMExec& self) {
@@ -362,16 +367,16 @@ static auto wrap_FGFDMExec_IntegrationSuspended_73(FGFDMExec& self) {
   return toJsValue(self.IntegrationSuspended());
 }
 
-static auto wrap_FGFDMExec_Setsim_time_74(FGFDMExec& self, double arg0) {
-  return toJsValue(self.Setsim_time(arg0));
+static auto wrap_FGFDMExec_Setsim_time_74(FGFDMExec& self, double cur_time) {
+  return toJsValue(self.Setsim_time(cur_time));
 }
 
-static void wrap_FGFDMExec_Setdt_75(FGFDMExec& self, double arg0) {
-  self.Setdt(arg0);
+static void wrap_FGFDMExec_Setdt_75(FGFDMExec& self, double delta_t) {
+  self.Setdt(delta_t);
 }
 
-static void wrap_FGFDMExec_SetRootDir_76(FGFDMExec& self, const std::string& arg0) {
-  self.SetRootDir(SGPath(arg0));
+static void wrap_FGFDMExec_SetRootDir_76(FGFDMExec& self, const std::string& rootDir) {
+  self.SetRootDir(SGPath(rootDir));
 }
 
 static auto wrap_FGFDMExec_GetRootDir_77(FGFDMExec& self) {
@@ -390,24 +395,24 @@ static auto wrap_FGFDMExec_GetDebugLevel_80(FGFDMExec& self) {
   return toJsValue(self.GetDebugLevel());
 }
 
-static void wrap_FGFDMExec_Initialize_81(FGFDMExec& self, uintptr_t arg0) {
-  self.Initialize(reinterpret_cast<const JSBSim::FGInitialCondition*>(arg0));
+static void wrap_FGFDMExec_Initialize_81(FGFDMExec& self, uintptr_t FGIC) {
+  self.Initialize(reinterpret_cast<const JSBSim::FGInitialCondition*>(FGIC));
 }
 
-static void wrap_FGFDMExec_SetHoldDown_82(FGFDMExec& self, bool arg0) {
-  self.SetHoldDown(arg0);
+static void wrap_FGFDMExec_SetHoldDown_82(FGFDMExec& self, bool hd) {
+  self.SetHoldDown(hd);
 }
 
 static auto wrap_FGFDMExec_GetHoldDown_83(FGFDMExec& self) {
   return toJsValue(self.GetHoldDown());
 }
 
-static auto wrap_FGFDMExec_GetTemplateFunc_84(FGFDMExec& self, const std::string& arg0) {
-  return toJsValue(self.GetTemplateFunc(arg0));
+static auto wrap_FGFDMExec_GetTemplateFunc_84(FGFDMExec& self, const std::string& name) {
+  return toJsValue(self.GetTemplateFunc(name));
 }
 
-static void wrap_FGFDMExec_AddTemplateFunc_85(FGFDMExec& self, const std::string& arg0, uintptr_t arg1) {
-  self.AddTemplateFunc(arg0, reinterpret_cast<JSBSim::Element*>(arg1));
+static void wrap_FGFDMExec_AddTemplateFunc_85(FGFDMExec& self, const std::string& name, uintptr_t el) {
+  self.AddTemplateFunc(name, reinterpret_cast<JSBSim::Element*>(el));
 }
 
 static auto wrap_FGFDMExec_GetRandomGenerator_86(FGFDMExec& self) {

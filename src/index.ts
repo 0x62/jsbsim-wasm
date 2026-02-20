@@ -1,4 +1,5 @@
-export type { FGFDMExecApi, OpaqueHandle } from "./generated/fgfdmexec-api";
+export * from "./generated/fgfdmexec-api";
+export { JSBSimApi } from "./generated/jsbsim-api";
 export type {
   JSBSimModuleFactory,
   JSBSimRuntimeModule,

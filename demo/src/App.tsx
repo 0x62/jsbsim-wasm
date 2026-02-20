@@ -6,7 +6,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 import { JSBSimSdk } from "@sdk";
 
@@ -27,6 +27,7 @@ type ScenarioManifest = {
   telemetry: {
     altitudeFt: string;
     verticalVelocityFps: string;
+    verticalAccelerationFps2: string;
     thrustProperty: string;
   };
   rocket: {
@@ -49,7 +50,14 @@ const LOOP_INTERVAL_MS = 50;
 const MAX_SAMPLES = 280;
 const SCENARIO_MANIFEST_PATH = "/scenario/hobby-rocket/manifest.json";
 
-const STAGE_SEQUENCE: FlightStage[] = ["launch", "burnout", "coast", "apogee", "descent", "landing"];
+const STAGE_SEQUENCE: FlightStage[] = [
+  "launch",
+  "burnout",
+  "coast",
+  "apogee",
+  "descent",
+  "landing",
+];
 
 const STAGE_LABELS: Record<FlightStage, string> = {
   launch: "Launch",
@@ -57,7 +65,7 @@ const STAGE_LABELS: Record<FlightStage, string> = {
   coast: "Coast",
   apogee: "Apogee",
   descent: "Descent",
-  landing: "Landing"
+  landing: "Landing",
 };
 
 function createStageState(): StageState {
@@ -67,7 +75,7 @@ function createStageState(): StageState {
     coast: false,
     apogee: false,
     descent: false,
-    landing: false
+    landing: false,
   };
 }
 
@@ -164,12 +172,12 @@ export default function App() {
 
     const nextState = {
       ...stageStateRef.current,
-      [stage]: true
+      [stage]: true,
     };
 
     const nextTimes = {
       ...stageTimesRef.current,
-      [stage]: time
+      [stage]: time,
     };
 
     stageStateRef.current = nextState;
@@ -194,25 +202,21 @@ export default function App() {
   }, []);
 
   const readTelemetry = useCallback(
-    (sdk: JSBSimSdk, scenario: ScenarioManifest, previous: TelemetrySample | null): TelemetrySample => {
+    (sdk: JSBSimSdk, scenario: ScenarioManifest): TelemetrySample => {
       const time = sdk.getSimTime();
-      const rawAltitude = sdk.getProperty(scenario.telemetry.altitudeFt);
-      const velocity = sdk.getProperty(scenario.telemetry.verticalVelocityFps);
+      const rawAltitude = sdk.getPropertyValue(scenario.telemetry.altitudeFt);
+      const velocity = sdk.getPropertyValue(scenario.telemetry.verticalVelocityFps);
+      const acceleration = sdk.getPropertyValue(scenario.telemetry.verticalAccelerationFps2);
       const altitude = rawAltitude - baselineAltitudeRef.current;
-
-      let acceleration = 0;
-      if (previous && time > previous.time) {
-        acceleration = (velocity - previous.velocity) / (time - previous.time);
-      }
 
       return {
         time,
         altitude,
         velocity,
-        acceleration
+        acceleration,
       };
     },
-    []
+    [],
   );
 
   const bootstrapScenario = useCallback(async () => {
@@ -240,7 +244,7 @@ export default function App() {
       const nextManifest = (await manifestResponse.json()) as ScenarioManifest;
       const sdk = await JSBSimSdk.create({
         moduleUrl: withBase("/wasm/jsbsim_wasm.mjs"),
-        wasmUrl: withBase("/wasm/jsbsim_wasm.wasm")
+        wasmUrl: withBase("/wasm/jsbsim_wasm.wasm"),
       });
 
       sdk.configurePaths({
@@ -248,11 +252,12 @@ export default function App() {
         aircraftPath: "aircraft",
         enginePath: "engine",
         systemsPath: "systems",
-        outputPath: "output"
+        outputPath: "output",
       });
 
       for (const file of nextManifest.files) {
         const bytes = await fetchBytes(withBase(file.publicPath));
+        console.log(`Wrote ${bytes.length} bytes to ${file.runtimePath}`);
         sdk.writeDataFile(file.runtimePath, bytes);
       }
 
@@ -261,14 +266,15 @@ export default function App() {
         throw new Error(`Failed to load scenario script: ${nextManifest.scriptPath}`);
       }
 
-      if (!sdk.runIC()) {
+      if (!sdk.runIc()) {
         throw new Error("Failed to initialize the rocket scenario.");
       }
 
-      sdk.setProperty(nextManifest.telemetry.thrustProperty, 0);
+      sdk.setPropertyValue(nextManifest.telemetry.thrustProperty, 0);
 
-      baselineAltitudeRef.current = sdk.getProperty(nextManifest.telemetry.altitudeFt);
-      const firstSample = readTelemetry(sdk, nextManifest, null);
+      baselineAltitudeRef.current = sdk.getPropertyValue(nextManifest.telemetry.altitudeFt);
+
+      const firstSample = readTelemetry(sdk, nextManifest);
 
       sdkRef.current = sdk;
       setManifest(nextManifest);
@@ -311,13 +317,14 @@ export default function App() {
 
     if (launched && launchStart !== null) {
       const elapsed = sdk.getSimTime() - launchStart;
-      const thrust = elapsed >= 0 && elapsed <= manifest.rocket.burnDurationSec ? manifest.rocket.thrustLbf : 0;
-      sdk.setProperty(manifest.telemetry.thrustProperty, thrust);
+      const thrust =
+        elapsed >= 0 && elapsed <= manifest.rocket.burnDurationSec ? manifest.rocket.thrustLbf : 0;
+      sdk.setPropertyValue(manifest.telemetry.thrustProperty, thrust);
     }
 
     const previousSample = latestSampleRef.current;
     const keepRunning = sdk.run();
-    const sample = readTelemetry(sdk, manifest, previousSample);
+    const sample = readTelemetry(sdk, manifest);
     appendSample(sample);
 
     if (!keepRunning) {
@@ -367,7 +374,7 @@ export default function App() {
       sample.velocity <= 0;
 
     if (touchedDown) {
-      sdk.setProperty(manifest.telemetry.thrustProperty, 0);
+      sdk.setPropertyValue(manifest.telemetry.thrustProperty, 0);
       completeStage("descent", sample.time);
       completeStage("landing", sample.time);
       setRunning(false);
@@ -432,8 +439,8 @@ export default function App() {
         <p className="kicker">JSBSim WASM Demo</p>
         <h1>Hobby Rocket Launch</h1>
         <p className="copy">
-          Press Launch to ignite a preloaded model rocket. The demo tracks altitude, vertical velocity, and vertical
-          acceleration from liftoff through burnout and touchdown.
+          Press Launch to ignite a preloaded model rocket. The demo tracks altitude, vertical
+          velocity, and vertical acceleration from liftoff through burnout and touchdown.
         </p>
       </header>
 
@@ -473,7 +480,9 @@ export default function App() {
                 className={`stage-chip ${completed ? "completed" : "pending"} ${isCurrent ? "current" : ""}`}
               >
                 <p className="stage-name">{STAGE_LABELS[stage]}</p>
-                <p className="stage-meta">{completed ? `${formatNumber(stamp ?? Number.NaN, 2)} s` : "waiting"}</p>
+                <p className="stage-meta">
+                  {completed ? `${formatNumber(stamp ?? Number.NaN, 2)} s` : "waiting"}
+                </p>
               </article>
             );
           })}
@@ -508,9 +517,18 @@ export default function App() {
             <h3>Altitude (ft)</h3>
             <div className="chart-frame">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={samples} syncId="telemetry-time" margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <LineChart
+                  data={samples}
+                  syncId="telemetry-time"
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(16, 32, 32, 0.14)" />
-                  <XAxis dataKey="time" tickFormatter={formatTimeTick} stroke="#425a58" tick={{ fontSize: 12 }} />
+                  <XAxis
+                    dataKey="time"
+                    tickFormatter={formatTimeTick}
+                    stroke="#425a58"
+                    tick={{ fontSize: 12 }}
+                  />
                   <YAxis stroke="#425a58" tick={{ fontSize: 12 }} width={64} />
                   <Tooltip labelFormatter={(value) => `t=${formatTimeTick(value)}`} />
                   <Line
@@ -530,9 +548,18 @@ export default function App() {
             <h3>Vertical Velocity (ft/s)</h3>
             <div className="chart-frame">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={samples} syncId="telemetry-time" margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <LineChart
+                  data={samples}
+                  syncId="telemetry-time"
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(16, 32, 32, 0.14)" />
-                  <XAxis dataKey="time" tickFormatter={formatTimeTick} stroke="#425a58" tick={{ fontSize: 12 }} />
+                  <XAxis
+                    dataKey="time"
+                    tickFormatter={formatTimeTick}
+                    stroke="#425a58"
+                    tick={{ fontSize: 12 }}
+                  />
                   <YAxis stroke="#425a58" tick={{ fontSize: 12 }} width={64} />
                   <Tooltip labelFormatter={(value) => `t=${formatTimeTick(value)}`} />
                   <Line
@@ -552,9 +579,18 @@ export default function App() {
             <h3>Vertical Acceleration (ft/s^2)</h3>
             <div className="chart-frame">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={samples} syncId="telemetry-time" margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                <LineChart
+                  data={samples}
+                  syncId="telemetry-time"
+                  margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(16, 32, 32, 0.14)" />
-                  <XAxis dataKey="time" tickFormatter={formatTimeTick} stroke="#425a58" tick={{ fontSize: 12 }} />
+                  <XAxis
+                    dataKey="time"
+                    tickFormatter={formatTimeTick}
+                    stroke="#425a58"
+                    tick={{ fontSize: 12 }}
+                  />
                   <YAxis stroke="#425a58" tick={{ fontSize: 12 }} width={64} />
                   <Tooltip labelFormatter={(value) => `t=${formatTimeTick(value)}`} />
                   <Line

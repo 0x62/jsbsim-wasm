@@ -140,7 +140,7 @@ const scriptXml = `<?xml version="1.0" encoding="UTF-8"?>
 const generatedFiles = [
   { runtimePath: "aircraft/hobby_rocket/hobby_rocket.xml", contents: modelXml },
   { runtimePath: "aircraft/hobby_rocket/launchpad.xml", contents: initXml },
-  { runtimePath: "scripts/hobby_rocket_launch.xml", contents: scriptXml }
+  { runtimePath: "scripts/hobby_rocket_launch.xml", contents: scriptXml },
 ];
 
 function ensureDir(dirPath) {
@@ -166,7 +166,7 @@ function main() {
 
   const files = generatedFiles.map((file) => ({
     runtimePath: file.runtimePath,
-    publicPath: `/scenario/${scenarioName}/${file.runtimePath}`
+    publicPath: `/scenario/${scenarioName}/${file.runtimePath}`,
   }));
 
   const manifest = {
@@ -176,18 +176,23 @@ function main() {
     telemetry: {
       altitudeFt: "position/h-sl-ft",
       verticalVelocityFps: "velocities/h-dot-fps",
-      thrustProperty: "propulsion/rocket_thrust"
+      verticalAccelerationFps2: "accelerations/a-pilot-z-ft_sec2",
+      thrustProperty: "propulsion/rocket_thrust",
     },
     rocket: {
       thrustLbf: 24,
       burnDurationSec: 2.2,
       launchDelaySec: 0.15,
-      touchdownAltitudeFt: 0.5
+      touchdownAltitudeFt: 0.5,
     },
-    files
+    files,
   };
 
-  fs.writeFileSync(path.join(scenarioRoot, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  fs.writeFileSync(
+    path.join(scenarioRoot, "manifest.json"),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    "utf8",
+  );
   process.stdout.write(`Synced demo scenario with ${files.length} files.\n`);
 }
 

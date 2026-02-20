@@ -5,6 +5,7 @@
   "telemetry": {
     "altitudeFt": "position/h-sl-ft",
     "verticalVelocityFps": "velocities/h-dot-fps",
+    "verticalAccelerationFps2": "accelerations/a-pilot-z-ft_sec2",
     "thrustProperty": "propulsion/rocket_thrust"
   },
   "rocket": {

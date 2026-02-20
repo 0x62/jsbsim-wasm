@@ -4,7 +4,7 @@ import type {
   JSBSimLogStream,
   JSBSimModuleFactory,
   JSBSimRuntimeModule,
-  LoadJSBSimModuleOptions
+  LoadJSBSimModuleOptions,
 } from "./types";
 
 const ANSI_ESCAPE_PATTERN = /\u001b\[[0-?]*[ -/]*[@-~]/g;
@@ -47,11 +47,16 @@ function normalizeLogText(raw: string, options: JSBSimLogOptions): string {
 function emitLog(stream: JSBSimLogStream, args: unknown[], options: JSBSimLogOptions = {}): void {
   const raw = args.map(stringifyLogArg).join(" ");
   const message = normalizeLogText(raw, options);
+
+  if (message === "") {
+    return;
+  }
+
   const entry: JSBSimLogEntry = {
     stream,
     message,
     raw,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
   if (options.console ?? true) {
@@ -80,13 +85,17 @@ async function resolveFactory(options: LoadJSBSimModuleOptions): Promise<JSBSimM
   const loaded = await import(/* @vite-ignore */ toHref(moduleUrl));
 
   if (typeof loaded.default !== "function") {
-    throw new Error(`Expected a default Emscripten module factory export from ${moduleUrl.toString()}`);
+    throw new Error(
+      `Expected a default Emscripten module factory export from ${moduleUrl.toString()}`,
+    );
   }
 
   return loaded.default as JSBSimModuleFactory;
 }
 
-export async function loadJSBSimModule(options: LoadJSBSimModuleOptions = {}): Promise<JSBSimRuntimeModule> {
+export async function loadJSBSimModule(
+  options: LoadJSBSimModuleOptions = {},
+): Promise<JSBSimRuntimeModule> {
   const moduleFactory = await resolveFactory(options);
 
   const locateFile = (path: string, prefix: string): string => {
@@ -108,6 +117,6 @@ export async function loadJSBSimModule(options: LoadJSBSimModuleOptions = {}): P
     },
     printErr: (...args: unknown[]) => {
       emitLog("stderr", args, options.log);
-    }
+    },
   });
 }
