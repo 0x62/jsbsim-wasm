@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-02-20T14:41:20.436Z",
+  "generatedAt": "2026-02-20T15:02:12.395Z",
   "package": {
     "name": "@0x62/jsbsim-wasm",
-    "version": "1.2.4-beta.1",
+    "version": "1.2.4-beta.2",
     "npmTag": "beta",
-    "tarballName": "0x62-jsbsim-wasm-1.2.4-beta.1.tgz",
-    "unpackedSize": 1892717
+    "tarballName": "0x62-jsbsim-wasm-1.2.4-beta.2.tgz",
+    "unpackedSize": 1842425
   },
   "release": {
-    "gitTag": "v1.2.4-beta.1",
-    "gitCommit": "caa73cb7d83a8d2cd61462450927d63981eaa9b2",
-    "gitShortCommit": "caa73cb",
+    "gitTag": "v1.2.4-beta.2",
+    "gitCommit": "87695151775e7ce68fb5d0df803569dca965b534",
+    "gitShortCommit": "8769515",
     "gitBranch": "master"
   },
   "jsbsim": {
@@ -69,27 +69,12 @@
     {
       "path": "dist/wasm/jsbsim_wasm.wasm",
       "size": 1588236,
-      "sha256": "15793c4548e28688b0dc77cf364e1afaccaa6d977f52ce82e0b3419dddcf0cb5"
-    },
-    {
-      "path": "generated/FGFDMExecBindings.cpp",
-      "size": 17846,
-      "sha256": "8e17ac03fd57a3f2cd9d57c64a35bb78813cf5ee3e6232efdf0ec981cf82285f"
+      "sha256": "fe62e285511221137dc6c8521762999efcb2a2ef5e7ef854db55030fed230208"
     },
     {
       "path": "package.json",
-      "size": 2079,
-      "sha256": "0674b068ec006d0bad679e741c04b7397b0f783fc9450799350847c1d2a41eac"
-    },
-    {
-      "path": "src/generated/fgfdmexec-api.ts",
-      "size": 14824,
-      "sha256": "41f816f85ec1d7d0f1bcb209ca8dae9bfe57af373838ee975bd54cf43821b8a3"
-    },
-    {
-      "path": "src/generated/jsbsim-api.ts",
-      "size": 17584,
-      "sha256": "664de03ff65a8eaa60d15db06190570437603c9db8694a720a230b3da8ff5412"
+      "size": 2041,
+      "sha256": "72059cc4420972b73f783c7a994682b628522b2379c9cbea7c15466f0953af4b"
     }
   ]
 }

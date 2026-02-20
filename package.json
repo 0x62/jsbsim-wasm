@@ -1,6 +1,6 @@
 {
   "name": "@0x62/jsbsim-wasm",
-  "version": "1.2.4-beta.1",
+  "version": "1.2.4-beta.2",
   "description": "Tooling and TypeScript SDK for JSBSim compiled to WebAssembly",
   "license": "MIT",
   "type": "module",
@@ -9,9 +9,7 @@
     "email": "ben@bl.je"
   },
   "files": [
-    "dist",
-    "generated",
-    "src/generated"
+    "dist"
   ],
   "main": "dist/index.js",
   "module": "dist/index.js",
