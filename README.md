@@ -45,7 +45,14 @@ Artifacts:
 - WASM runtime: `dist/wasm/jsbsim_wasm.mjs`, `dist/wasm/jsbsim_wasm.wasm`
 - SDK package output: `dist/*`
 
-## SDK Example
+## SDK Usage
+
+`JSBSimSdk` extends a generated `JSBSimApi` class:
+
+- `JSBSimApi` is generated from `FGFDMExec.h` and exposes methods in `camelCase`.
+- `JSBSimSdk` adds runtime/VFS helpers (`create`, `writeDataFile`, `syncToPersistence`, etc.).
+
+### Basic lifecycle
 
 ```ts
 import { JSBSimSdk } from "@0x62/jsbsim-wasm";
@@ -55,16 +62,16 @@ const sdk = await JSBSimSdk.create({
   wasmUrl: new URL("./dist/wasm/jsbsim_wasm.wasm", import.meta.url),
   persistence: { enabled: true },
   log: {
-    console: true,           // Also output to console
-    stripAnsi: true,         // Remove escape sequences from log output
-    onStdout: (entry) => {}, // optional hook for JSBSim stdout
-    onStderr: (entry) => {}  // optional hook for JSBSim stderr
+    console: true,
+    stripAnsi: true
   }
 });
 
-// Write model/config files into VFS
+// Write runtime files into MEMFS
 sdk.writeDataFile("aircraft/c172/c172.xml", xmlText);
+sdk.writeDataFile("scripts/c172-test.xml", scriptXml);
 
+// Optional: override runtime search paths
 sdk.configurePaths({
   rootDir: "/runtime",
   aircraftPath: "aircraft",
@@ -72,14 +79,70 @@ sdk.configurePaths({
   systemsPath: "systems"
 });
 
-sdk.loadModel("c172");
-sdk.runIC();
-sdk.run();
+sdk.loadModel("c172"); // addModelToPath defaults to true
+sdk.loadScript("scripts/c172-test.xml"); // deltaT defaults to 0, initfile defaults to ""
+sdk.runIc();
 
-const altitude = sdk.getProperty("position/h-sl-ft");
+while (sdk.run()) {
+  const altitudeFt = sdk.getPropertyValue("position/h-sl-ft");
+  if (altitudeFt > 2000) break;
+}
 
-// Persist runtime tree to IDBFS when needed
 await sdk.syncToPersistence();
+```
+
+### Enums and mode flags
+
+```ts
+import {
+  JSBSimSdk,
+  TrimMode,
+  ResetToInitialConditionsMode
+} from "@0x62/jsbsim-wasm";
+
+const sdk = await JSBSimSdk.create();
+
+sdk.setTrimMode(TrimMode.tLongitudinal);
+sdk.doTrim(TrimMode.tLongitudinal);
+
+// Reset flags are bitmasks and can be OR-ed together.
+sdk.resetToInitialConditions(
+  ResetToInitialConditionsMode.START_NEW_OUTPUT |
+  ResetToInitialConditionsMode.DONT_EXECUTE_RUN_IC
+);
+
+// Required when DONT_EXECUTE_RUN_IC is set.
+sdk.runIc();
+```
+
+### Overloads and default parameters
+
+```ts
+// Generated overloads map directly to FGFDMExec overloads.
+sdk.loadModel("c172");
+sdk.loadModel("aircraft", "engine", "systems", "c172");
+
+// JSBSimSdk helper for path overrides.
+sdk.loadModelWithOptions("c172", {
+  aircraftPath: "aircraft",
+  enginePath: "engine",
+  systemsPath: "systems",
+  addModelToPath: true
+});
+
+// Default args mirrored from FGFDMExec.h.
+sdk.loadPlanet("earth.xml"); // useAircraftPath defaults to true
+sdk.forceOutput(); // idx defaults to 0
+const catalog = sdk.queryPropertyCatalog("fcs/"); // end_of_line defaults to "\n"
+```
+
+### Raw exec access
+
+If you need the underlying embind object, it is available on `sdk.exec`:
+
+```ts
+sdk.exec.RunIC();
+sdk.exec.Run();
 ```
 
 ## Updating JSBSim
@@ -147,7 +210,12 @@ npm run demo:dev
 
 ## Notes on API Exposure
 
-The generated bridge exports all parsed public methods on `FGFDMExec` automatically. For complex native types that are not JS-safe, opaque numeric handles are used.
+The binding generator parses `FGFDMExec.h` and emits:
+
+- `src/generated/fgfdmexec-api.ts` (TypeScript types/enums for embind surface)
+- `src/generated/jsbsim-api.ts` (camelCase wrapper class with JSDoc/defaults)
+
+Most public `FGFDMExec` methods are exposed automatically; a small ignore list is used for methods that are not useful in this SDK context (for example output file-name overrides). For complex native types that are not JS-safe, opaque numeric handles are used.
 
 ## License
 

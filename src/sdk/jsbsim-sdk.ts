@@ -1,4 +1,5 @@
 import type { FGFDMExecApi } from "../generated/fgfdmexec-api";
+import { JSBSimApi } from "../generated/jsbsim-api";
 import type { BinaryLike, JSBSimRuntimeModule, JSBSimSdkOptions } from "./types";
 import { loadJSBSimModule } from "./load-module";
 import { WasmVfsManager } from "./vfs";
@@ -21,17 +22,19 @@ export interface LoadModelOptions {
 const DEFAULT_RUNTIME_ROOT = "/runtime";
 const DEFAULT_IDB_ROOT = "/persist";
 
-export class JSBSimSdk {
+export class JSBSimSdk extends JSBSimApi {
   readonly module: JSBSimRuntimeModule;
-  readonly exec: FGFDMExecApi;
   readonly vfs: WasmVfsManager;
 
   private constructor(module: JSBSimRuntimeModule, exec: FGFDMExecApi, vfs: WasmVfsManager) {
+    super(exec);
     this.module = module;
-    this.exec = exec;
     this.vfs = vfs;
   }
 
+  /**
+   * Loads the JSBSim runtime module, creates `FGFDMExec`, and initializes VFS.
+   */
   static async create(options: JSBSimSdkOptions = {}): Promise<JSBSimSdk> {
     const module = await loadJSBSimModule(options);
     const runtimeRoot = options.runtimeRoot ?? DEFAULT_RUNTIME_ROOT;
@@ -48,6 +51,9 @@ export class JSBSimSdk {
     return sdk;
   }
 
+  /**
+   * Sets standard JSBSim runtime directories on `FGFDMExec`.
+   */
   configurePaths(options: ConfigurePathsOptions = {}): void {
     const rootDir = options.rootDir ?? this.vfs.runtimeRoot;
     const aircraftPath = options.aircraftPath ?? "aircraft";
@@ -55,18 +61,21 @@ export class JSBSimSdk {
     const systemsPath = options.systemsPath ?? "systems";
     const outputPath = options.outputPath ?? "output";
 
-    this.exec.SetRootDir(rootDir);
-    this.exec.SetAircraftPath(aircraftPath);
-    this.exec.SetEnginePath(enginePath);
-    this.exec.SetSystemsPath(systemsPath);
-    this.exec.SetOutputPath(outputPath);
+    this.setRootDir(rootDir);
+    this.setAircraftPath(aircraftPath);
+    this.setEnginePath(enginePath);
+    this.setSystemsPath(systemsPath);
+    this.setOutputPath(outputPath);
   }
 
-  loadModel(model: string, options: LoadModelOptions = {}): boolean {
+  /**
+   * Loads an aircraft model using optional path overrides.
+   */
+  loadModelWithOptions(model: string, options: LoadModelOptions = {}): boolean {
     const addModelToPath = options.addModelToPath ?? true;
 
     if (options.aircraftPath || options.enginePath || options.systemsPath) {
-      return this.exec.LoadModel(
+      return this.loadModel(
         options.aircraftPath ?? "aircraft",
         options.enginePath ?? "engine",
         options.systemsPath ?? "systems",
@@ -75,73 +84,61 @@ export class JSBSimSdk {
       );
     }
 
-    return this.exec.LoadModel(model, addModelToPath);
+    return this.loadModel(model, addModelToPath);
   }
 
-  loadScript(path: string, deltaT = 0, initFile = ""): boolean {
-    return this.exec.LoadScript(path, deltaT, initFile);
+  /**
+   * Loads a script with JSBSim defaults for optional arguments.
+   */
+  loadScriptWithDefaults(path: string, deltaT = 0, initFile = ""): boolean {
+    return this.loadScript(path, deltaT, initFile);
   }
 
-  run(): boolean {
-    return this.exec.Run();
-  }
-
-  runIC(): boolean {
-    return this.exec.RunIC();
-  }
-
-  setDeltaT(value: number): void {
-    this.exec.Setdt(value);
-  }
-
-  getDeltaT(): number {
-    return this.exec.GetDeltaT();
-  }
-
-  getSimTime(): number {
-    return this.exec.GetSimTime();
-  }
-
-  setProperty(path: string, value: number): void {
-    this.exec.SetPropertyValue(path, value);
-  }
-
-  getProperty(path: string): number {
-    return this.exec.GetPropertyValue(path);
-  }
-
-  queryPropertyCatalog(check: string, endOfLine = "\n"): string {
-    return this.exec.QueryPropertyCatalog(check, endOfLine);
-  }
-
-  forceOutput(index = 0): void {
-    this.exec.ForceOutput(index);
-  }
-
+  /**
+   * Writes data to MEMFS (relative to runtime root) and returns resolved path.
+   */
   writeDataFile(path: string, data: BinaryLike): string {
     return this.vfs.writeRuntimeFile(path, data);
   }
 
+  /**
+   * Reads data from MEMFS (relative to runtime root).
+   */
   readDataFile(path: string, encoding: "utf8" | "binary" = "utf8"): string | Uint8Array {
     return this.vfs.readRuntimeFile(path, encoding);
   }
 
+  /**
+   * Creates a runtime directory and returns resolved path.
+   */
   mkdir(path: string): string {
     return this.vfs.mkdirRuntime(path);
   }
 
+  /**
+   * Synchronizes IDBFS -> MEMFS when persistence is enabled.
+   */
   async syncFromPersistence(): Promise<void> {
     await this.vfs.syncFromPersistence();
   }
 
+  /**
+   * Synchronizes MEMFS -> IDBFS when persistence is enabled.
+   */
   async syncToPersistence(): Promise<void> {
     await this.vfs.syncToPersistence();
   }
 
+  /**
+   * Mounts IDBFS and performs an initial pull.
+   */
   async enablePersistence(): Promise<void> {
     await this.vfs.enablePersistence();
   }
 
+  /**
+   * Destroys the underlying wasm-bound exec instance.
+   */
   destroy(): void {
     this.module.destroy?.(this.exec);
   }

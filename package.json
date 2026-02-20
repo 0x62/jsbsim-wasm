@@ -36,7 +36,7 @@
     "demo:dev": "npm --prefix demo run dev",
     "demo:build": "npm --prefix demo run build",
     "demo:preview": "npm --prefix demo run preview",
-    "clean": "rm -rf build dist generated/FGFDMExecBindings.cpp src/generated/fgfdmexec-api.ts"
+    "clean": "rm -rf build dist generated/FGFDMExecBindings.cpp src/generated/fgfdmexec-api.ts src/generated/jsbsim-api.ts"
   },
   "engines": {
     "node": ">=20"
