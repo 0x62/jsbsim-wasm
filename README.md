@@ -3,7 +3,7 @@
 This repository builds [JSBSim](https://github.com/JSBSim-Team/jsbsim) to WebAssembly for Node.js and browsers, and ships a TypeScript SDK for loading and interacting with `FGFDMExec`.
 
 > [!WARNING]  
-> This toolkit is still in early development and may contain bugs or unexpected behavior. *Please note that WASM and SDK builds are not available yet. To use this libary, you must build it yourself.*
+> This toolkit is still in early development and may contain bugs or unexpected behavior.
 
 **Demo: https://0x62.github.io/jsbsim-wasm/**
 
@@ -15,6 +15,14 @@ This repository builds [JSBSim](https://github.com/JSBSim-Team/jsbsim) to WebAss
 - Runtime data lives in Emscripten MEMFS for speed.
 - Optional persistence is available through IDBFS sync (browser).
 - SDK package output is ESM-first.
+
+## Installation
+
+```bash
+npm install --save @0x62/jsbsim-wasm
+```
+
+Note that versioning of this package is tied to JSBSim version. For example, `@0x62/jsbsim-wasm@1.2.4` contains the built version of JSBSim `1.2.4`.
 
 ## Prerequisites
 
