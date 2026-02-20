@@ -32,15 +32,47 @@ jobs:
         with:
           version: 3.1.69
 
+      - name: Check latest JSBSim tag
+        id: check
+        run: |
+          set -euo pipefail
+          git -C vendor/jsbsim fetch origin --tags
+          eval "$(node ./scripts/resolve-jsbsim-release.mjs --format env)"
+          CURRENT_BASE_VERSION="$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json","utf8")).version.split("-")[0]')"
+
+          echo "latest_tag=$JSBSIM_TAG" >> "$GITHUB_OUTPUT"
+          echo "latest_version=$JSBSIM_VERSION" >> "$GITHUB_OUTPUT"
+
+          if [[ "$CURRENT_BASE_VERSION" == "$JSBSIM_VERSION" ]]; then
+            echo "update_needed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "update_needed=true" >> "$GITHUB_OUTPUT"
+
       - name: Update JSBSim and rebuild artifacts
-        run: ./scripts/update-jsbsim.sh origin/master
+        if: steps.check.outputs.update_needed == 'true'
+        run: ./scripts/update-jsbsim.sh --tag "${{ steps.check.outputs.latest_tag }}" --sync-version
+
+      - name: Resolve package version
+        if: steps.check.outputs.update_needed == 'true'
+        id: version
+        run: |
+          set -euo pipefail
+          echo "package_version=$(node -p 'JSON.parse(require("node:fs").readFileSync("package.json","utf8")).version')" >> "$GITHUB_OUTPUT"
 
       - name: Create Pull Request
+        if: steps.check.outputs.update_needed == 'true'
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: chore/update-jsbsim-wasm
-          commit-message: "chore: update JSBSim and regenerate wasm"
-          title: "chore: update JSBSim and regenerate wasm"
+          branch: chore/update-jsbsim-${{ steps.check.outputs.latest_tag }}
+          delete-branch: true
+          commit-message: "chore: update JSBSim to ${{ steps.check.outputs.latest_tag }} (${{ steps.version.outputs.package_version }})"
+          title: "chore: update JSBSim to ${{ steps.check.outputs.latest_tag }}"
           body: |
-            Automated update of JSBSim submodule + regenerated bindings/wasm artifacts.
+            Automated update to JSBSim `${{ steps.check.outputs.latest_tag }}`.
+            - Updates JSBSim submodule
+            - Regenerates bindings/API
+            - Rebuilds WASM + SDK
+            - Sets package version to `${{ steps.version.outputs.package_version }}`
           labels: dependencies, automation

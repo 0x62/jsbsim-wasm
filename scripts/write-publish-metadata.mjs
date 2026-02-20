@@ -18,7 +18,8 @@ function parseArgs(argv) {
   const out = {
     version: "",
     npmTag: "latest",
-    output: "release/publish-metadata.json"
+    output: "release/publish-metadata.json",
+    jsbsimTag: ""
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -37,6 +38,12 @@ function parseArgs(argv) {
 
     if (arg === "--output") {
       out.output = argv[i + 1] ?? out.output;
+      i += 1;
+      continue;
+    }
+
+    if (arg === "--jsbsim-tag") {
+      out.jsbsimTag = argv[i + 1] ?? "";
       i += 1;
       continue;
     }
@@ -68,6 +75,14 @@ function main() {
   const jsbsimCommit = run("git -C vendor/jsbsim rev-parse HEAD", rootDir);
   const jsbsimShortCommit = run("git -C vendor/jsbsim rev-parse --short HEAD", rootDir);
   const jsbsimDescribe = run("git -C vendor/jsbsim describe --tags --always", rootDir);
+  let resolvedJsbsimTag = args.jsbsimTag;
+  if (!resolvedJsbsimTag) {
+    try {
+      resolvedJsbsimTag = run("git -C vendor/jsbsim describe --tags --abbrev=0", rootDir);
+    } catch {
+      resolvedJsbsimTag = "";
+    }
+  }
 
   const packJsonRaw = run("npm pack --json --dry-run", rootDir);
   const packEntries = JSON.parse(packJsonRaw);
@@ -106,6 +121,7 @@ function main() {
     },
     jsbsim: {
       submodulePath: "vendor/jsbsim",
+      tag: resolvedJsbsimTag,
       commit: jsbsimCommit,
       shortCommit: jsbsimShortCommit,
       describe: jsbsimDescribe

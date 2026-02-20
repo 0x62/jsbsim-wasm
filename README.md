@@ -56,10 +56,11 @@ Artifacts:
 
 ```ts
 import { JSBSimSdk } from "@0x62/jsbsim-wasm";
+import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
 
 const sdk = await JSBSimSdk.create({
-  moduleUrl: new URL("./dist/wasm/jsbsim_wasm.mjs", import.meta.url),
-  wasmUrl: new URL("./dist/wasm/jsbsim_wasm.wasm", import.meta.url),
+  moduleUrl: wasmModuleUrl,
+  wasmUrl: wasmBinaryUrl,
   persistence: { enabled: true },
   log: {
     console: true,
@@ -90,6 +91,19 @@ while (sdk.run()) {
 
 await sdk.syncToPersistence();
 ```
+
+### WASM package export
+
+Use the package `/wasm` export to reference the bundled runtime artifacts:
+
+```ts
+import { wasmBinaryUrl, wasmModuleUrl } from "@0x62/jsbsim-wasm/wasm";
+```
+
+Raw artifact subpaths are also exported:
+
+- `@0x62/jsbsim-wasm/wasm/module`
+- `@0x62/jsbsim-wasm/wasm/binary`
 
 ### Enums and mode flags
 
@@ -162,29 +176,32 @@ This will:
 
 ### CI automation
 
-`.github/workflows/update-jsbsim.yml` runs weekly and on manual trigger, rebuilds artifacts, and opens/updates a PR.
+`.github/workflows/update-jsbsim.yml` runs weekly and on manual trigger, checks for a newer stable JSBSim tag, and opens/updates a PR only when a new version is available. The PR updates the submodule, regenerates artifacts, and bumps package version to the next `<jsbsim>-beta.<N>` release.
 
 ## Release Workflow
 
 Run a release preparation with:
 
 ```bash
-./scripts/release.sh 0.2.0
+./scripts/release.sh
 ```
 
 What it does by default:
 
-1. Updates `package.json` / `package-lock.json` version.
-2. Runs `npm run build`.
-3. Generates `release/publish-metadata.json`.
-4. Creates a release commit.
-5. Creates an annotated tag `v<version>`.
+1. Resolves the target JSBSim tag (latest stable `vX.Y.Z` unless overridden).
+2. Checks out that JSBSim tag in the submodule, reapplies patches, and rebuilds SDK/WASM artifacts.
+3. Sets package version to `<jsbsim-version>-beta.<N>` (for example `1.2.4-beta.1`, auto-incremented from npm history).
+4. Creates a release commit and annotated git tag.
+5. Publishes to npm.
+6. Creates a GitHub release and uploads `release/dist-<version>.tar.gz` plus `release/publish-metadata.json`.
+7. Pushes commit + tag to origin.
 
 Useful flags:
 
-- `--skip-build`
-- `--skip-commit`
-- `--skip-tag`
+- `--jsbsim-tag <tag>`
+- `--beta <N>`
+- `--npm-tag <tag>`
+- `--skip-demo-check`
 - `--allow-dirty`
 - `--dry-run`
 
