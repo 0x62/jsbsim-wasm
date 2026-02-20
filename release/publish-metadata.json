@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-02-20T15:02:12.395Z",
+  "generatedAt": "2026-02-20T15:06:58.132Z",
   "package": {
     "name": "@0x62/jsbsim-wasm",
-    "version": "1.2.4-beta.2",
+    "version": "1.2.4-beta.3",
     "npmTag": "beta",
-    "tarballName": "0x62-jsbsim-wasm-1.2.4-beta.2.tgz",
-    "unpackedSize": 1842425
+    "tarballName": "0x62-jsbsim-wasm-1.2.4-beta.3.tgz",
+    "unpackedSize": 1842532
   },
   "release": {
-    "gitTag": "v1.2.4-beta.2",
-    "gitCommit": "87695151775e7ce68fb5d0df803569dca965b534",
-    "gitShortCommit": "8769515",
+    "gitTag": "v1.2.4-beta.3",
+    "gitCommit": "419a987e9fe7fd371bdfbcdfacc39f5c0358714e",
+    "gitShortCommit": "419a987",
     "gitBranch": "master"
   },
   "jsbsim": {
@@ -28,8 +28,8 @@
     },
     {
       "path": "README.md",
-      "size": 6841,
-      "sha256": "778900962ca975ef18172c1deccde825a892e1d1989e98e6c13abc8e46ebfe58"
+      "size": 6948,
+      "sha256": "7046a5bf4a10fa47f9116a697085c69dc046f35cd8fb070313686d8aada21b64"
     },
     {
       "path": "dist/index.d.ts",
@@ -69,12 +69,12 @@
     {
       "path": "dist/wasm/jsbsim_wasm.wasm",
       "size": 1588236,
-      "sha256": "fe62e285511221137dc6c8521762999efcb2a2ef5e7ef854db55030fed230208"
+      "sha256": "35ccb84f2d0fd0654c1002cacfbcb654aaa6cb4f6845a501e2472c4a86766aa5"
     },
     {
       "path": "package.json",
       "size": 2041,
-      "sha256": "72059cc4420972b73f783c7a994682b628522b2379c9cbea7c15466f0953af4b"
+      "sha256": "c22537c29bf7aad4f46d6efe2a876970809513d4d140fb6f825c6b6e744923e0"
     }
   ]
 }
