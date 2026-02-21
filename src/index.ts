@@ -13,4 +13,4 @@ export type {
 } from "./sdk/types";
 export { loadJSBSimModule } from "./sdk/load-module";
 export { JSBSimSdk } from "./sdk/jsbsim-sdk";
-export type { ConfigurePathsOptions, LoadModelOptions } from "./sdk/jsbsim-sdk";
+export type { ConfigurePathsOptions, LoadModelOptions, JSBSimSdkLogEvent, JSBSimSdkLogListener } from "./sdk/jsbsim-sdk";

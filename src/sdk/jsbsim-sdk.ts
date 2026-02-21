@@ -1,6 +1,6 @@
 import type { FGFDMExecApi } from "../generated/fgfdmexec-api";
 import { JSBSimApi } from "../generated/jsbsim-api";
-import type { BinaryLike, JSBSimRuntimeModule, JSBSimSdkOptions } from "./types";
+import type { BinaryLike, JSBSimLogEntry, JSBSimRuntimeModule, JSBSimSdkOptions } from "./types";
 import { loadJSBSimModule } from "./load-module";
 import { WasmVfsManager } from "./vfs";
 
@@ -22,21 +22,52 @@ export interface LoadModelOptions {
 const DEFAULT_RUNTIME_ROOT = "/runtime";
 const DEFAULT_IDB_ROOT = "/persist";
 
+export type JSBSimSdkLogEvent = "stdout" | "stderr" | "log";
+export type JSBSimSdkLogListener = (entry: JSBSimLogEntry) => void;
+
 export class JSBSimSdk extends JSBSimApi {
   readonly module: JSBSimRuntimeModule;
   readonly vfs: WasmVfsManager;
+  private readonly logListeners: Record<JSBSimSdkLogEvent, Set<JSBSimSdkLogListener>>;
 
   private constructor(module: JSBSimRuntimeModule, exec: FGFDMExecApi, vfs: WasmVfsManager) {
     super(exec);
     this.module = module;
     this.vfs = vfs;
+    this.logListeners = {
+      stdout: new Set(),
+      stderr: new Set(),
+      log: new Set(),
+    };
   }
 
   /**
    * Loads the JSBSim runtime module, creates `FGFDMExec`, and initializes VFS.
    */
   static async create(options: JSBSimSdkOptions = {}): Promise<JSBSimSdk> {
-    const module = await loadJSBSimModule(options);
+    const originalLog = options.log;
+    let bufferedLogEntries: JSBSimLogEntry[] = [];
+    let emitSdkLog: ((entry: JSBSimLogEntry) => void) | null = null;
+
+    const forwardLogEntry = (entry: JSBSimLogEntry): void => {
+      if (emitSdkLog) {
+        emitSdkLog(entry);
+        return;
+      }
+
+      bufferedLogEntries.push(entry);
+    };
+
+    const module = await loadJSBSimModule({
+      ...options,
+      log: {
+        ...(originalLog ?? {}),
+        onLog: (entry) => {
+          originalLog?.onLog?.(entry);
+          forwardLogEntry(entry);
+        },
+      },
+    });
     const runtimeRoot = options.runtimeRoot ?? DEFAULT_RUNTIME_ROOT;
     const idbMountPath = options.persistence?.idbMountPath ?? DEFAULT_IDB_ROOT;
 
@@ -47,8 +78,53 @@ export class JSBSimSdk extends JSBSimApi {
 
     const exec = new module.FGFDMExec();
     const sdk = new JSBSimSdk(module, exec, vfs);
+    emitSdkLog = (entry) => sdk.emitLogEntry(entry);
+    for (const entry of bufferedLogEntries) {
+      emitSdkLog(entry);
+    }
+    bufferedLogEntries = [];
+
     sdk.configurePaths();
     return sdk;
+  }
+
+  /**
+   * Registers a handler for JSBSim log output events.
+   */
+  on(event: JSBSimSdkLogEvent, listener: JSBSimSdkLogListener): this {
+    this.logListeners[event].add(listener);
+    return this;
+  }
+
+  /**
+   * Removes a previously registered log handler.
+   */
+  off(event: JSBSimSdkLogEvent, listener: JSBSimSdkLogListener): this {
+    this.logListeners[event].delete(listener);
+    return this;
+  }
+
+  /**
+   * Registers a one-time handler for a log output event.
+   */
+  once(event: JSBSimSdkLogEvent, listener: JSBSimSdkLogListener): this {
+    const wrapper: JSBSimSdkLogListener = (entry) => {
+      this.off(event, wrapper);
+      listener(entry);
+    };
+
+    return this.on(event, wrapper);
+  }
+
+  private emitLogEntry(entry: JSBSimLogEntry): void {
+    this.emitLogEvent(entry.stream, entry);
+    this.emitLogEvent("log", entry);
+  }
+
+  private emitLogEvent(event: JSBSimSdkLogEvent, entry: JSBSimLogEntry): void {
+    for (const listener of this.logListeners[event]) {
+      listener(entry);
+    }
   }
 
   /**
@@ -80,7 +156,7 @@ export class JSBSimSdk extends JSBSimApi {
         options.enginePath ?? "engine",
         options.systemsPath ?? "systems",
         model,
-        addModelToPath
+        addModelToPath,
       );
     }
 
@@ -141,5 +217,8 @@ export class JSBSimSdk extends JSBSimApi {
    */
   destroy(): void {
     this.module.destroy?.(this.exec);
+    this.logListeners.stdout.clear();
+    this.logListeners.stderr.clear();
+    this.logListeners.log.clear();
   }
 }
