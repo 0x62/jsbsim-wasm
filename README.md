@@ -76,6 +76,14 @@ const sdk = await JSBSimSdk.create({
   }
 });
 
+sdk.on("stdout", (entry) => {
+  console.log("[jsbsim]", entry.message);
+});
+
+sdk.on("stderr", (entry) => {
+  console.error("[jsbsim]", entry.message);
+});
+
 // Write runtime files into MEMFS
 sdk.writeDataFile("aircraft/c172/c172.xml", xmlText);
 sdk.writeDataFile("scripts/c172-test.xml", scriptXml);
