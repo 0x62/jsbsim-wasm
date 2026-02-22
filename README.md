@@ -121,6 +121,9 @@ Raw artifact subpaths are also exported:
 - `@0x62/jsbsim-wasm/wasm/module`
 - `@0x62/jsbsim-wasm/wasm/binary`
 
+> [!WARNING]  
+> To use the binary/module URLs you must disable dependancy optimisation in your bundler. For example, in Vite, set `optimizeDeps.exclude: ["@0x62/jsbsim-wasm/wasm"]`. Alternatively, upload the WASM binary/module file to `public/` and pass the URL directly.
+
 ### Enums and mode flags
 
 ```ts
