@@ -1,16 +1,16 @@
 {
-  "generatedAt": "2026-02-20T15:06:58.132Z",
+  "generatedAt": "2026-02-22T00:00:36.177Z",
   "package": {
     "name": "@0x62/jsbsim-wasm",
-    "version": "1.2.4-beta.3",
+    "version": "1.2.4-beta.4",
     "npmTag": "beta",
-    "tarballName": "0x62-jsbsim-wasm-1.2.4-beta.3.tgz",
-    "unpackedSize": 1842532
+    "tarballName": "0x62-jsbsim-wasm-1.2.4-beta.4.tgz",
+    "unpackedSize": 1848436
   },
   "release": {
-    "gitTag": "v1.2.4-beta.3",
-    "gitCommit": "419a987e9fe7fd371bdfbcdfacc39f5c0358714e",
-    "gitShortCommit": "419a987",
+    "gitTag": "v1.2.4-beta.4",
+    "gitCommit": "8326145a50375e96ac952eac1dfce9a46ba75265",
+    "gitShortCommit": "8326145",
     "gitBranch": "master"
   },
   "jsbsim": {
@@ -28,23 +28,23 @@
     },
     {
       "path": "README.md",
-      "size": 6948,
-      "sha256": "7046a5bf4a10fa47f9116a697085c69dc046f35cd8fb070313686d8aada21b64"
+      "size": 7104,
+      "sha256": "1ace0da8d3b4922c14ec2e193945a404fdd1e151136070d738bf76905d09a783"
     },
     {
       "path": "dist/index.d.ts",
-      "size": 34797,
-      "sha256": "e2401320c51ead90f18d7401e0c856a1e1b5dca055cb5ed886d949b971010367"
+      "size": 35486,
+      "sha256": "c3e659bda4f4699f46de85fe0a4413650f709fea99e366237c4ac149224224a3"
     },
     {
       "path": "dist/index.js",
-      "size": 25398,
-      "sha256": "40adaac96c40e5b8bffc21c55456cb63c747b5186498ad6d409d8ab091ac613c"
+      "size": 27044,
+      "sha256": "d54a8be7dcdaec9f4f70aed2580797d67e6e18aff60b1bf5bbfd2df915ac5bc7"
     },
     {
       "path": "dist/index.js.map",
-      "size": 59964,
-      "sha256": "a1704d33114473676bf000b7da69f407ab9d297d266fd49d493a09c303f24b80"
+      "size": 63377,
+      "sha256": "6bf91e2e43a2e718470fae93980a980fc0261df1057d761ecb0ae5a74227f74d"
     },
     {
       "path": "dist/wasm.d.ts",
@@ -69,12 +69,12 @@
     {
       "path": "dist/wasm/jsbsim_wasm.wasm",
       "size": 1588236,
-      "sha256": "35ccb84f2d0fd0654c1002cacfbcb654aaa6cb4f6845a501e2472c4a86766aa5"
+      "sha256": "2c79b90ff12c7cd94b36a9af8db07e0bde19ffe4e2716816dc6cea8ad4f8de92"
     },
     {
       "path": "package.json",
       "size": 2041,
-      "sha256": "c22537c29bf7aad4f46d6efe2a876970809513d4d140fb6f825c6b6e744923e0"
+      "sha256": "5b8ccba5baa02ec39b3f9a4970636f607a79363342bd321142166d5e23046093"
     }
   ]
 }
