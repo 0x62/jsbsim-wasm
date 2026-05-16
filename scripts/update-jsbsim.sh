@@ -74,7 +74,7 @@ if [[ -n "$TARGET_TAG" && $USE_LATEST_TAG -eq 1 ]]; then
   exit 1
 fi
 
-"$ROOT_DIR/scripts/prepare-jsbsim.sh"
+"$ROOT_DIR/scripts/prepare-jsbsim.sh" --skip-patch
 git -C "$JSBSIM_DIR" fetch origin --tags
 
 if [[ $USE_LATEST_TAG -eq 1 ]]; then
