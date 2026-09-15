@@ -178,6 +178,66 @@ sdk.exec.RunIC();
 sdk.exec.Run();
 ```
 
+### Fast property access
+
+`getPropertyValue()` converts the name and walks the property tree on every
+call. When a simulation loop reads the same properties every step, resolve them
+once with a batch:
+
+```ts
+const gear = sdk.createPropertyBatch([
+  "gear/unit[0]/WOW",
+  "gear/unit[0]/compression-ft",
+  "velocities/u-fps",
+]);
+
+sdk.run();
+const [wow, compressionFt, uFps] = gear.read(); // one call for every value
+
+gear.write([1, 0.2, 90]); // or gear.set(index, value)
+gear.dispose();
+```
+
+`read()` returns a `Float64Array` view of wasm memory: use it before the next
+SDK call, or pass your own array (`gear.read(target)`) to copy. Paths that do
+not exist read as `NaN` and are listed in `gear.missing`; pass
+`{ create: true }` to create them. Create batches after `loadModel()`.
+
+On an Apple M5 (Node 26, C172, `npm run bench:property-batch`), reading 15
+properties took 3.58 µs with `getPropertyValue()` and 0.14 µs with a batch.
+
+### Gear contact state
+
+`createGearContactReader()` returns a read-only snapshot of every landing-gear
+and contact unit after the last `run()`: weight on wheels, strut compression,
+compression velocity and force, contact location relative to the CG, wheel
+roll/side velocity, slip and steering angles, and the roll/side and body-axis
+reaction forces JSBSim applied.
+
+```ts
+import { GEAR_CONTACT_FIELDS } from "@0x62/jsbsim-wasm";
+
+const contacts = sdk.createGearContactReader();
+sdk.run();
+const values = contacts.read(); // contacts.count * contacts.stride numbers
+const noseGear = contacts.readUnit(0); // { wow, strutForceLbs, wheelRollForceLbs, ... }
+```
+
+Units and signs are JSBSim's (ft, ft/s, lbf, deg); a supporting strut reports a
+negative force, and the body forces of all units sum to
+`forces/fb{x,y,z}-gear-lbs`. Reading never changes the simulation. Readers are
+detached automatically by `sdk.destroy()`.
+
+## Testing
+
+```bash
+npm run build:wasm
+npm run build:sdk
+npm test
+```
+
+Tests use Node's built-in test runner and the C172 model from `vendor/jsbsim`.
+
 ## Updating JSBSim
 
 ### Local
@@ -252,6 +312,8 @@ The binding generator parses `FGFDMExec.h` and emits:
 - `src/generated/jsbsim-api.ts` (camelCase wrapper class with JSDoc/defaults)
 
 Most public `FGFDMExec` methods are exposed automatically; a small ignore list is used for methods that are not useful in this SDK context (for example output file-name overrides). For complex native types that are not JS-safe, opaque numeric handles are used.
+
+Hand-written bindings that go beyond `FGFDMExec` live in `bindings/*.cpp` and are compiled into the same module (`PropertyBatch`, `GearContacts`). They are not regenerated.
 
 ## License
 

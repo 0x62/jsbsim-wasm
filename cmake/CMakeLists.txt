@@ -27,7 +27,10 @@ set(SYSTEM_EXPAT OFF CACHE BOOL "" FORCE)
 
 add_subdirectory("${JSBSIM_SOURCE_DIR}" "${CMAKE_BINARY_DIR}/jsbsim" EXCLUDE_FROM_ALL)
 
-add_executable(jsbsim_wasm "${JSBSIM_WASM_BINDINGS}")
+# Hand-written extensions live beside the generated FGFDMExec bindings.
+file(GLOB JSBSIM_WASM_EXTENSION_BINDINGS CONFIGURE_DEPENDS "${CMAKE_CURRENT_LIST_DIR}/../bindings/*.cpp")
+
+add_executable(jsbsim_wasm "${JSBSIM_WASM_BINDINGS}" ${JSBSIM_WASM_EXTENSION_BINDINGS})
 
 set_target_properties(jsbsim_wasm PROPERTIES
   OUTPUT_NAME "jsbsim_wasm"

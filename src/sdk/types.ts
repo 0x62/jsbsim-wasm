@@ -1,4 +1,6 @@
 import type { FGFDMExecApi } from "../generated/fgfdmexec-api";
+import type { NativeGearContacts } from "./gear-contacts";
+import type { NativePropertyBatch } from "./property-batch";
 
 export type BinaryLike = Uint8Array | ArrayBuffer | string;
 
@@ -30,6 +32,10 @@ export interface EmscriptenFs {
 
 export interface JSBSimRuntimeModule {
   FGFDMExec: new () => FGFDMExecApi;
+  /** Absent in wasm builds that predate `bindings/PropertyBatchBindings.cpp`. */
+  PropertyBatch?: new (exec: FGFDMExecApi) => NativePropertyBatch;
+  /** Absent in wasm builds that predate `bindings/GearContactBindings.cpp`. */
+  GearContacts?: new (exec: FGFDMExecApi) => NativeGearContacts;
   FS: EmscriptenFs;
   destroy?(value: unknown): void;
 }

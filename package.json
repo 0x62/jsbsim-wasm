@@ -35,6 +35,8 @@
     "generate:bindings": "node ./scripts/generate-fgfdmexec-bindings.mjs",
     "build:wasm": "./scripts/build-wasm.sh",
     "build:sdk": "tsup --config tsup.config.ts",
+    "test": "node --test test/",
+    "bench:property-batch": "node bench/property-batch.mjs",
     "build": "npm run generate:bindings && npm run build:wasm && npm run build:sdk",
     "typecheck": "tsc --noEmit",
     "update:jsbsim": "./scripts/update-jsbsim.sh",
